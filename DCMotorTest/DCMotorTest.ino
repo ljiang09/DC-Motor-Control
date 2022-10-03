@@ -51,12 +51,12 @@ void loop() {
   myOtherMotor->run(FORWARD);
   for (i=0; i<255; i++) {
     myMotor->setSpeed(i);
-    myOtherMotor->setSpeed(i);
+    myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
   for (i=255; i!=0; i--) {
     myMotor->setSpeed(i);
-    myOtherMotor->setSpeed(i);
+    myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
 
@@ -66,12 +66,12 @@ void loop() {
   myOtherMotor->run(BACKWARD);
   for (i=0; i<255; i++) {
     myMotor->setSpeed(i);
-    myOtherMotor->setSpeed(i);
+    myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
   for (i=255; i!=0; i--) {
     myMotor->setSpeed(i);
-    myOtherMotor->setSpeed(i);
+    myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
 
