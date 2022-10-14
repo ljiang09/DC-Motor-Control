@@ -39,14 +39,18 @@ void loop() {
 
   if (analogRead(rightSensorPin) > 500) {
     Serial.println("Black tape");
+    turnRight();
   } else {
     Serial.println("Reflective floor");
+    // TODO: change the right wheel speed back to normal
   }
 
   if (analogRead(leftSensorPin) > 500) {
     Serial.println("Black tape");
+    turnLeft();
   } else {
     Serial.println("Reflective floor");
+    // TODO: change the left wheel speed back to normal
   }
 
 }
@@ -54,7 +58,7 @@ void loop() {
 
 // helper functions for controlling wheel movement
 void turnLeft() {
-  // change leftWheelSpeed and rightWheelSpeed here
+  // slow left wheel speed
 }
 
 void turnRight() {

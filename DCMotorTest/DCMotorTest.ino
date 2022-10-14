@@ -31,7 +31,7 @@ void setup() {
   Serial.println("Motor Shield found.");
 
   // Set the speed to start, from 0 (off) to 255 (max speed)
-  myMotor->setSpeed(150);
+  myMotor->setSpeed(50);
   myMotor->run(FORWARD);
   // turn on motor
   myMotor->run(RELEASE);
@@ -49,12 +49,12 @@ void loop() {
 
   myMotor->run(FORWARD);
   myOtherMotor->run(FORWARD);
-  for (i=0; i<255; i++) {
+  for (i=0; i<100; i++) {
     myMotor->setSpeed(i);
     myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
-  for (i=255; i!=0; i--) {
+  for (i=100; i!=0; i--) {
     myMotor->setSpeed(i);
     myOtherMotor->setSpeed(i*0.3);
     delay(10);
@@ -64,12 +64,12 @@ void loop() {
 
   myMotor->run(BACKWARD);
   myOtherMotor->run(BACKWARD);
-  for (i=0; i<255; i++) {
+  for (i=0; i<100; i++) {
     myMotor->setSpeed(i);
     myOtherMotor->setSpeed(i*0.3);
     delay(10);
   }
-  for (i=255; i!=0; i--) {
+  for (i=100; i!=0; i--) {
     myMotor->setSpeed(i);
     myOtherMotor->setSpeed(i*0.3);
     delay(10);
