@@ -10,9 +10,14 @@ const int rightSensorPin = A1;
 const int leftWheelPin = 3;
 const int rightWheelPin = 5;
 
+const int sensorThresholdValue = 650;
+
 // speed ranges from 0 (off) to 255 (max speed)
 int leftWheelSpeed = 10;
 int rightWheelSpeed = 10;
+
+int leftWheelSpeedMax = 50;
+int rightWheelSpeedMax = 50;
 
 
 void setup() {
@@ -37,7 +42,9 @@ void loop() {
   // if left value represents white, turn right
   // if right value represents white, turn left a bit
 
-  if (analogRead(rightSensorPin) > 500) {
+//  Serial.println(analogRead(rightSensorPin));
+
+  if (analogRead(rightSensorPin) > sensorThresholdValue) {
     Serial.println("Black tape");
     turnRight();
   } else {
@@ -45,7 +52,7 @@ void loop() {
     // TODO: change the right wheel speed back to normal
   }
 
-  if (analogRead(leftSensorPin) > 500) {
+  if (analogRead(leftSensorPin) > sensorThresholdValue) {
     Serial.println("Black tape");
     turnLeft();
   } else {
