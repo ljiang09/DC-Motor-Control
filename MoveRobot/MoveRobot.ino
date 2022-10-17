@@ -62,5 +62,9 @@ void turnLeft() {
 }
 
 void turnRight() {
-  // change leftWheelSpeed and rightWheelSpeed here
+  // slow right wheel speed here
+}
+
+void logData() {
+  // send wheel velocity data to a file and save
 }
