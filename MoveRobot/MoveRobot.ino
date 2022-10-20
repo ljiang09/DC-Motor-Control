@@ -5,19 +5,22 @@
 // Create the motor shield object with the default I2C address
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
+// Initialize motors in the 1 and 2 positions on the shield
+Adafruit_DCMotor *rightMotor = AFMS.getMotor(3);
+Adafruit_DCMotor *leftMotor = AFMS.getMotor(4);
+
 const int leftSensorPin = A0;
 const int rightSensorPin = A1;
-const int leftWheelPin = 3;
-const int rightWheelPin = 5;
 
-const int sensorThresholdValue = 650;
+const int leftThreshold = 700;
+const int rightThreshold = 500;
 
 // speed ranges from 0 (off) to 255 (max speed)
-int leftWheelSpeed = 10;
-int rightWheelSpeed = 10;
-
-int leftWheelSpeedMax = 50;
-int rightWheelSpeedMax = 50;
+int rightMotorSpeed = 40;
+int leftMotorSpeed = rightMotorSpeed * 60/100;
+int leftSlowedSpeed = leftMotorSpeed / 3;
+int rightSlowedSpeed = rightMotorSpeed / 3;
+int i = 0;
 
 
 void setup() {
@@ -30,12 +33,15 @@ void setup() {
     while (1);
   }
   Serial.println("Motor Shield found.");
-
+  
+  leftMotor->setSpeed(leftMotorSpeed);
+  rightMotor->setSpeed(rightMotorSpeed);
 }
 
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  leftMotor->run(BACKWARD);
+  rightMotor->run(FORWARD);
 
   // continually read in the sensor values
   // if both values represent black, continue straight
@@ -43,33 +49,49 @@ void loop() {
   // if right value represents white, turn left a bit
 
 //  Serial.println(analogRead(rightSensorPin));
+//  Serial.println(analogRead(leftSensorPin));
 
-  if (analogRead(rightSensorPin) > sensorThresholdValue) {
-    Serial.println("Black tape");
+  if (analogRead(rightSensorPin) > rightThreshold) {
+//    Serial.print("Black tape  ");
+//    Serial.println(analogRead(leftSensorPin));
+//    leftMotor->setSpeed(0);
+//    rightMotor->setSpeed(0);
     turnRight();
   } else {
-    Serial.println("Reflective floor");
-    // TODO: change the right wheel speed back to normal
+//    Serial.print("Reflective floor");
+//    Serial.println(analogRead(leftSensorPin));
+    goStraight();
   }
 
-  if (analogRead(leftSensorPin) > sensorThresholdValue) {
-    Serial.println("Black tape");
+  if (analogRead(leftSensorPin) > leftThreshold) {
+//    Serial.print("Black tape  ");
+//    Serial.println(analogRead(rightSensorPin));
+//    leftMotor->setSpeed(0);
+//    rightMotor->setSpeed(0);
     turnLeft();
   } else {
-    Serial.println("Reflective floor");
-    // TODO: change the left wheel speed back to normal
+//    Serial.print("Reflective floor");
+//    Serial.println(analogRead(rightSensorPin));
+    goStraight();
   }
 
 }
 
 
 // helper functions for controlling wheel movement
-void turnLeft() {
+void turnRight() {
   // slow left wheel speed
+  leftMotor->setSpeed(leftSlowedSpeed);
 }
 
-void turnRight() {
-  // slow right wheel speed here
+void turnLeft() {
+  // slow right wheel speed
+  rightMotor->setSpeed(rightSlowedSpeed);
+}
+
+void goStraight() {
+  leftMotor->setSpeed(leftMotorSpeed);
+  rightMotor->setSpeed(rightMotorSpeed);
 }
 
 void logData() {
