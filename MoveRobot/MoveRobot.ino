@@ -9,18 +9,22 @@ Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *rightMotor = AFMS.getMotor(3);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(4);
 
-const int leftSensorPin = A0;
-const int rightSensorPin = A1;
+const int leftSensorPin = A1;
+const int rightSensorPin = A0;
 
-const int leftThreshold = 700;
-const int rightThreshold = 500;
+float leftThreshold = 200;
+float rightThreshold = 200;
+
+
+// NTOE TO SELF: motors are flipped irl and in code
+// sensors are correct tho
 
 // speed ranges from 0 (off) to 255 (max speed)
-int rightMotorSpeed = 40;
-int leftMotorSpeed = rightMotorSpeed * 60/100;
-int leftSlowedSpeed = leftMotorSpeed / 3;
-int rightSlowedSpeed = rightMotorSpeed / 3;
-int i = 0;
+float motorRatio = 60/100;
+int leftMotorSpeed = 24;
+int rightMotorSpeed = 40;  //leftMotorSpeed * motorRatio;
+int leftSlowedSpeed = round(leftMotorSpeed * 0.75);
+int rightSlowedSpeed = round(rightMotorSpeed * 0.75);
 
 
 void setup() {
@@ -33,67 +37,110 @@ void setup() {
     while (1);
   }
   Serial.println("Motor Shield found.");
-  
+
   leftMotor->setSpeed(leftMotorSpeed);
   rightMotor->setSpeed(rightMotorSpeed);
 }
 
 
 void loop() {
-  leftMotor->run(BACKWARD);
-  rightMotor->run(FORWARD);
+//  goStraight();
+//  delay(1000);
+//  backUp();
 
-  // continually read in the sensor values
-  // if both values represent black, continue straight
-  // if left value represents white, turn right
-  // if right value represents white, turn left a bit
+//  if ((analogRead(rightSensorPin) > rightThreshold) && (analogRead(leftSensorPin) > leftThreshold)) {
+//      stopMoving();
+//  }
 
-//  Serial.println(analogRead(rightSensorPin));
-//  Serial.println(analogRead(leftSensorPin));
-
-  if (analogRead(rightSensorPin) > rightThreshold) {
-//    Serial.print("Black tape  ");
-//    Serial.println(analogRead(leftSensorPin));
-//    leftMotor->setSpeed(0);
-//    rightMotor->setSpeed(0);
+  if (analogRead(rightSensorPin) > rightThreshold) {  // black tape
+    stopMoving();
     turnRight();
-  } else {
-//    Serial.print("Reflective floor");
-//    Serial.println(analogRead(leftSensorPin));
+  } else {  // Reflective floor
     goStraight();
   }
 
-  if (analogRead(leftSensorPin) > leftThreshold) {
-//    Serial.print("Black tape  ");
-//    Serial.println(analogRead(rightSensorPin));
-//    leftMotor->setSpeed(0);
-//    rightMotor->setSpeed(0);
+  if (analogRead(leftSensorPin) > leftThreshold) {  // black tape
+    stopMoving();
     turnLeft();
-  } else {
-//    Serial.print("Reflective floor");
-//    Serial.println(analogRead(rightSensorPin));
+  } else {  // Reflective floor
     goStraight();
   }
+
+  logData();
 
 }
 
+
+void stopMoving() {
+  leftMotor->setSpeed(leftMotorSpeed*1.25);
+  rightMotor->setSpeed(rightMotorSpeed*1.5);
+  rightMotor->run(FORWARD);
+  leftMotor->run(BACKWARD);
+  delay(300);
+  leftMotor->setSpeed(0);
+  rightMotor->setSpeed(0);
+  delay(1000);
+}
+
+//void backUp() {
+//  leftMotor->setSpeed(leftMotorSpeed);
+//  rightMotor->setSpeed(rightMotorSpeed*0.75);
+//  leftMotor->run(BACKWARD);
+//  rightMotor->run(FORWARD);
+//  delay(700);
+//}
 
 // helper functions for controlling wheel movement
+// turns in place
 void turnRight() {
-  // slow left wheel speed
-  leftMotor->setSpeed(leftSlowedSpeed);
+//  backUp();
+  leftMotor->setSpeed(0);
+  rightMotor->setSpeed(rightMotorSpeed*1.5);
+  leftMotor->run(BACKWARD);
+  rightMotor->run(BACKWARD);
+
+  // turning right until the floor is spotted
+  for (int i = 0; i < 1000; i++) {
+    Serial.println("turning left");
+    if ((analogRead(leftSensorPin) <= leftThreshold) && (analogRead(rightSensorPin) <= rightThreshold)) {
+      leftMotor->setSpeed(0);
+      rightMotor->setSpeed(0);
+      delay(500);
+      return;
+    }
+  }
 }
 
+// turns in place, about the center
 void turnLeft() {
-  // slow right wheel speed
-  rightMotor->setSpeed(rightSlowedSpeed);
+//  backUp();
+  leftMotor->setSpeed(leftMotorSpeed*1.5);
+  rightMotor->setSpeed(0);
+  leftMotor->run(FORWARD);
+  rightMotor->run(FORWARD);
+
+  for (int i = 0; i < 1000; i++) {
+    Serial.println("turning right");
+    if ((analogRead(leftSensorPin) <= leftThreshold) && (analogRead(rightSensorPin) <= rightThreshold)) {
+      leftMotor->setSpeed(0);
+      rightMotor->setSpeed(0);
+      delay(500);
+      return;
+    }
+  }
 }
 
+// moves the bot forward
 void goStraight() {
   leftMotor->setSpeed(leftMotorSpeed);
   rightMotor->setSpeed(rightMotorSpeed);
+  leftMotor->run(FORWARD);
+  rightMotor->run(BACKWARD);
 }
 
+
+// helper function to print data into the monitor for pyserial to read
 void logData() {
-  // send wheel velocity data to a file and save
+  // log sensor data, commanded speeds
+  // TODO: implement this!!
 }
