@@ -6,32 +6,21 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Initialize motors in the 1 and 2 positions on the shield
-Adafruit_DCMotor *rightMotor = AFMS.getMotor(4);
 Adafruit_DCMotor *leftMotor = AFMS.getMotor(3);
+Adafruit_DCMotor *rightMotor = AFMS.getMotor(4);
 
-const int leftSensorPin = A2;
 const int rightSensorPin = A0;
+const int leftSensorPin = A2;
 
-float leftThreshold = 200;
-float rightThreshold = 200;
-
-
-// NTOE TO SELF: motors are flipped irl and in code
-// sensors are correct tho
+float sensorThreshold = 200;
 
 // speed ranges from 0 (off) to 255 (max speed)
-float motorRatio = 60/100;
 int leftMotorSpeed = 25;
-int rightMotorSpeed = 25;  //leftMotorSpeed * motorRatio;
-int leftSlowedSpeed = round(leftMotorSpeed * 0.75);
-int rightSlowedSpeed = round(rightMotorSpeed * 0.75);
+int rightMotorSpeed = leftMotorSpeed;
 
-
-bool runningTimer = false;  // if true, tells the loop to not overwrite the timer start value
-unsigned long startMoving = 0;
-
-String prevMsg = "";
-
+// for logging data
+int leftSpeed = leftMotorSpeed;
+int rightSpeed = rightMotorSpeed;
 
 
 void setup() {
@@ -51,21 +40,19 @@ void setup() {
 
 
 void loop() {
-  Serial.println(analogRead(rightSensorPin));
-  Serial.println(analogRead(leftSensorPin));
-  if ((analogRead(rightSensorPin) > rightThreshold) && (analogRead(leftSensorPin) > leftThreshold)) {
+  if ((analogRead(rightSensorPin) > sensorThreshold) && (analogRead(leftSensorPin) > sensorThreshold)) {
     leftMotorSpeed = leftMotorSpeed;
     rightMotorSpeed = rightMotorSpeed;
     return;
   }
 
-  if (analogRead(rightSensorPin) > rightThreshold) {  // black tape
+  if (analogRead(rightSensorPin) > sensorThreshold) {  // black tape
     turnRight();
   } else {  // Reflective floor
     goStraight();
   }
 
-  if (analogRead(leftSensorPin) > leftThreshold) {  // black tape
+  if (analogRead(leftSensorPin) > sensorThreshold) {  // black tape
     turnLeft();
   } else {  // Reflective floor
     goStraight();
@@ -81,6 +68,8 @@ void loop() {
 void turnRight() {
   leftMotor->setSpeed(leftMotorSpeed*1.25);
   rightMotor->setSpeed(rightMotorSpeed*1.25);
+  leftSpeed = leftMotorSpeed*1.25;
+  rightSpeed = -rightMotorSpeed*1.25;
   leftMotor->run(BACKWARD);
   rightMotor->run(BACKWARD);
 }
@@ -89,6 +78,8 @@ void turnRight() {
 void turnLeft() {
   leftMotor->setSpeed(leftMotorSpeed*1.25);
   rightMotor->setSpeed(rightMotorSpeed*1.25);
+  leftSpeed = -leftMotorSpeed*1.25;
+  rightSpeed = rightMotorSpeed*1.25;
   leftMotor->run(FORWARD);
   rightMotor->run(FORWARD);
 }
@@ -97,6 +88,8 @@ void turnLeft() {
 void goStraight() {
   leftMotor->setSpeed(leftMotorSpeed);
   rightMotor->setSpeed(rightMotorSpeed);
+  leftSpeed = leftMotorSpeed;
+  rightSpeed = rightMotorSpeed;
   leftMotor->run(BACKWARD);
   rightMotor->run(FORWARD);
 }
@@ -106,4 +99,6 @@ void goStraight() {
 void logData() {
   // log sensor data, commanded speeds
   // TODO: implement this!!
+  Serial.println(analogRead(rightSensorPin));
+  Serial.println(analogRead(leftSensorPin));
 }
