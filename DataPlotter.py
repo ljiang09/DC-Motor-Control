@@ -28,7 +28,7 @@ ax.plot(values[:,2], 'b', label=titles[2])
 ax.plot(values[:,3], 'k', label=titles[3])
 
 ax.set_title("Sensor Readings and Motor Speeds for Following Blob Shape")
-ax.set_xlabel("Time (ms)")
+ax.set_xlabel("Number of Arduino loops")
 ax.set_ylabel("Sensor Readings and Motor Speeds")
 ax.legend()
 
@@ -44,7 +44,7 @@ ax.plot(values[:,2], 'b', label=titles[2])
 ax.plot(values[:,3], 'k', label=titles[3])
 
 ax.set_title("Sensor Readings and Motor\nSpeeds for Following a Section of the Blob Shape")
-ax.set_xlabel("Time (ms)")
+ax.set_xlabel("Number of Arduino loops")
 ax.set_ylabel("Sensor Readings and Motor Speeds")
 ax.legend()
 
