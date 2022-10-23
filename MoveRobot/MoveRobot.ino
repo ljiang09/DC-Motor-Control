@@ -22,6 +22,9 @@ int rightMotorSpeed = leftMotorSpeed;
 int leftSpeed = leftMotorSpeed;
 int rightSpeed = rightMotorSpeed;
 
+// both sensors see tape at the right angle, but we still want it to print "STOP" when it hits the real black line
+unsigned long stopLogTimer = 0;
+
 
 void setup() {
   // put your setup code here, to run once:
@@ -48,6 +51,13 @@ void setup() {
 
 void loop() {
   if ((analogRead(rightSensorPin) > sensorThreshold) && (analogRead(leftSensorPin) > sensorThreshold)) {
+    if (stopLogTimer == 0) {
+      stopLogTimer = millis();
+    } else {
+      if (millis() - stopLogTimer > 5000) {
+        Serial.println("STOP");
+      }
+    }
     leftMotorSpeed = leftMotorSpeed;
     rightMotorSpeed = rightMotorSpeed;
     return;
@@ -74,7 +84,7 @@ void loop() {
 // turns in place
 void turnRight() {
   leftMotor->setSpeed(leftMotorSpeed*1.25);
-  rightMotor->setSpeed(rightMotorSpeed*1.25);
+  rightMotor->setSpeed(rightMotorSpeed*1.5);
   leftSpeed = leftMotorSpeed*1.25;
   rightSpeed = -rightMotorSpeed*1.25;
   leftMotor->run(BACKWARD);
