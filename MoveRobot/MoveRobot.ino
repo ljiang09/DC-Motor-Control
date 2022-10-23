@@ -34,8 +34,15 @@ void setup() {
   }
   Serial.println("Motor Shield found.");
 
-  leftMotor->setSpeed(leftMotorSpeed);
-  rightMotor->setSpeed(rightMotorSpeed);
+  Serial.println("Enter an integer for the baseline wheel speed.");
+  while (Serial.available() == 0) {
+    leftMotorSpeed = Serial.parseInt();
+    rightMotorSpeed = leftMotorSpeed;
+    leftSpeed = leftMotorSpeed;
+    rightSpeed = rightMotorSpeed;
+    leftMotor->setSpeed(leftMotorSpeed);
+    rightMotor->setSpeed(rightMotorSpeed);
+  }
 }
 
 
@@ -98,7 +105,6 @@ void goStraight() {
 // helper function to print data into the monitor for pyserial to read
 void logData() {
   // log sensor data, commanded speeds
-  // TODO: implement this!!
-  Serial.println(analogRead(rightSensorPin));
-  Serial.println(analogRead(leftSensorPin));
+  Serial.print(String(analogRead(leftSensorPin)) + " " + String(analogRead(rightSensorPin)) + " ");
+  Serial.println(String(leftSpeed) + " " + String(rightSpeed));
 }
