@@ -6,10 +6,10 @@
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 
 // Initialize motors in the 1 and 2 positions on the shield
-Adafruit_DCMotor *rightMotor = AFMS.getMotor(3);
-Adafruit_DCMotor *leftMotor = AFMS.getMotor(4);
+Adafruit_DCMotor *rightMotor = AFMS.getMotor(4);
+Adafruit_DCMotor *leftMotor = AFMS.getMotor(3);
 
-const int leftSensorPin = A1;
+const int leftSensorPin = A2;
 const int rightSensorPin = A0;
 
 float leftThreshold = 200;
@@ -21,10 +21,17 @@ float rightThreshold = 200;
 
 // speed ranges from 0 (off) to 255 (max speed)
 float motorRatio = 60/100;
-int leftMotorSpeed = 24;
-int rightMotorSpeed = 40;  //leftMotorSpeed * motorRatio;
+int leftMotorSpeed = 25;
+int rightMotorSpeed = 25;  //leftMotorSpeed * motorRatio;
 int leftSlowedSpeed = round(leftMotorSpeed * 0.75);
 int rightSlowedSpeed = round(rightMotorSpeed * 0.75);
+
+
+bool runningTimer = false;  // if true, tells the loop to not overwrite the timer start value
+unsigned long startMoving = 0;
+
+String prevMsg = "";
+
 
 
 void setup() {
@@ -44,23 +51,21 @@ void setup() {
 
 
 void loop() {
-//  goStraight();
-//  delay(1000);
-//  backUp();
-
-//  if ((analogRead(rightSensorPin) > rightThreshold) && (analogRead(leftSensorPin) > leftThreshold)) {
-//      stopMoving();
-//  }
+  Serial.println(analogRead(rightSensorPin));
+  Serial.println(analogRead(leftSensorPin));
+  if ((analogRead(rightSensorPin) > rightThreshold) && (analogRead(leftSensorPin) > leftThreshold)) {
+    leftMotorSpeed = leftMotorSpeed;
+    rightMotorSpeed = rightMotorSpeed;
+    return;
+  }
 
   if (analogRead(rightSensorPin) > rightThreshold) {  // black tape
-    stopMoving();
     turnRight();
   } else {  // Reflective floor
     goStraight();
   }
 
   if (analogRead(leftSensorPin) > leftThreshold) {  // black tape
-    stopMoving();
     turnLeft();
   } else {  // Reflective floor
     goStraight();
@@ -71,71 +76,29 @@ void loop() {
 }
 
 
-void stopMoving() {
-  leftMotor->setSpeed(leftMotorSpeed*1.25);
-  rightMotor->setSpeed(rightMotorSpeed*1.5);
-  rightMotor->run(FORWARD);
-  leftMotor->run(BACKWARD);
-  delay(300);
-  leftMotor->setSpeed(0);
-  rightMotor->setSpeed(0);
-  delay(1000);
-}
-
-//void backUp() {
-//  leftMotor->setSpeed(leftMotorSpeed);
-//  rightMotor->setSpeed(rightMotorSpeed*0.75);
-//  leftMotor->run(BACKWARD);
-//  rightMotor->run(FORWARD);
-//  delay(700);
-//}
-
 // helper functions for controlling wheel movement
 // turns in place
 void turnRight() {
-//  backUp();
-  leftMotor->setSpeed(0);
-  rightMotor->setSpeed(rightMotorSpeed*1.5);
+  leftMotor->setSpeed(leftMotorSpeed*1.25);
+  rightMotor->setSpeed(rightMotorSpeed*1.25);
   leftMotor->run(BACKWARD);
   rightMotor->run(BACKWARD);
-
-  // turning right until the floor is spotted
-  for (int i = 0; i < 1000; i++) {
-    Serial.println("turning left");
-    if ((analogRead(leftSensorPin) <= leftThreshold) && (analogRead(rightSensorPin) <= rightThreshold)) {
-      leftMotor->setSpeed(0);
-      rightMotor->setSpeed(0);
-      delay(500);
-      return;
-    }
-  }
 }
 
 // turns in place, about the center
 void turnLeft() {
-//  backUp();
-  leftMotor->setSpeed(leftMotorSpeed*1.5);
-  rightMotor->setSpeed(0);
+  leftMotor->setSpeed(leftMotorSpeed*1.25);
+  rightMotor->setSpeed(rightMotorSpeed*1.25);
   leftMotor->run(FORWARD);
   rightMotor->run(FORWARD);
-
-  for (int i = 0; i < 1000; i++) {
-    Serial.println("turning right");
-    if ((analogRead(leftSensorPin) <= leftThreshold) && (analogRead(rightSensorPin) <= rightThreshold)) {
-      leftMotor->setSpeed(0);
-      rightMotor->setSpeed(0);
-      delay(500);
-      return;
-    }
-  }
 }
 
 // moves the bot forward
 void goStraight() {
   leftMotor->setSpeed(leftMotorSpeed);
   rightMotor->setSpeed(rightMotorSpeed);
-  leftMotor->run(FORWARD);
-  rightMotor->run(BACKWARD);
+  leftMotor->run(BACKWARD);
+  rightMotor->run(FORWARD);
 }
 
 
